@@ -1,0 +1,25 @@
+
+<div id="cart" class="container-lg container-fluid">
+    <h1 class="display-6">
+      <a (click)="goBack()" class="back-btn fw-lighter text-dark text-decoration-none">🡨</a>
+      Cart
+    </h1>
+    <app-cart-table [updatable]="true" (onCartUpdate)="cartUpdate($event)" ></app-cart-table>
+    <div class="row align-items-start">
+      <div class="col text-center" *ngIf="isEmptyCart ; else withButton">
+        <!-- <button class="btn btn-success btn-lg" routerLink="/checkout">Checkout</button> goto: /checkout -->
+      </div>
+      <ng-template #withButton>
+          <div class="col text-center">
+            <button class="btn btn-success btn-lg" routerLink="/checkout">Checkout</button>
+          </div>
+      </ng-template>
+    </div>
+    <div class="row align-items-start" *ngIf="recommendations.length > 0 ">
+      <h3 class="display-6 fs-3 text-center mt-4 mb-3">We also recommend:</h3>
+      <div class="col col-lg-3 mb-4" *ngFor="let recommended of recommendations">
+        <app-product-details [product]="recommended"></app-product-details>
+      </div>
+    </div>
+</div>
+

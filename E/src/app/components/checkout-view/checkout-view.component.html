@@ -1,0 +1,47 @@
+<div id="checkout" class="container-lg container-fluid">
+  <div class="row align-items-start">
+    <div class="col">
+      <h1 class="display-6">
+        <a (click)="goBack()" class="back-btn fw-lighter text-dark text-decoration-none"><i class="bi bi-arrow-left-circle"></i></a>
+        <span class="ms-4">Checkout</span>
+      </h1>
+      <hr class="mt-4">
+    </div>
+  </div>
+  <div class="row align-items-start">
+    <div class="col col-lg-9">
+      <app-cart-table></app-cart-table>
+    </div>
+    <div class="col col-lg-3" *ngIf="shippingAddress" >
+      <div class="card">
+            <div class="card-header text-white bg-primary">Shipping Address</div>
+            <div class="card-body">
+              <p class="card-text">
+                <b>{{ shippingAddress.recipient }}</b><br>
+                {{ shippingAddress.streetAddress }}<br>
+                <span *ngIf="shippingAddress.streetAddress2">{{ shippingAddress.streetAddress2 }}<br></span>
+                {{ shippingAddress.city }}, {{ shippingAddress.province.code }}<br>
+                {{ shippingAddress.postalCode }}
+              </p>
+            </div>
+            <div class="card-footer">
+              {{ shippingAddress.delivery }}
+            </div>
+            <!-- <div class="card-footer" *ngIf="coordinate">
+              <p>{{ coordinate.lat}}, {{coordinate.lng}}</p>
+            </div> -->
+            <!-- <div class="card-footer" *ngIf="time">
+                <p>Estimated Time : {{ time }}</p>
+            </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="row align-items-start">
+    <div class="col col-lg-9 text-center">
+      <button class="btn btn-primary btn-lg" routerLink="/catalog">Continue Shopping</button><!-- goto: /catalog -->
+      <button class="btn btn-success btn-lg ms-4" (click)="checkoutCart()">Checkout</button><!-- goto: /finish -->
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,162 @@
+const express = require('express');
+const app     = express();
+const session = require('express-session');
+const port    = process.argv[2] || 44130;
+const dao     = require('./dao');
+const net     = require('net');
+const http    = require('http');
+
+const tcpPort = '36970';
+const tcpHost = '130.63.96.131';
+const KEY = 'S5u5dcCXjY6BBr57ZkNDbsoTHIb4Jk7a';
+const mapROOTURL = 'http://www.mapquestapi.com/directions/v2/route?key=' + KEY; 
+
+app.enable('trust proxy');
+app.use(session({
+  name: 'project-C',
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+  proxy: true
+}));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+  next();
+});
+
+let response = [];
+
+function formatDistance(distance) {
+  let result; 
+  result = distance.split(', ');
+  return parseFloat(result[0]).toFixed(2);
+}
+
+function formatTime(time){
+  let result;
+  let datetimeFormat = new Date("2019-01-01T" + time);
+  let mins = datetimeFormat.getMinutes();
+  let sec = datetimeFormat.getSeconds();
+  result = mins + (sec/60);
+  return result;
+}
+
+
+app.get('/GeoNode', function (req, res) {
+  res.setHeader('Content-Type', 'text/plain');
+
+    if((!req.session.lat1) || (!req.session.lng1)){ // check is do we have both data in session
+      req.session.lat1 = req.query.lat;
+      req.session.lng1 = req.query.lng;
+      res.write('RECIEVED'); // response
+      res.end();
+    }else{ // we have session so now just combine
+      let prev_data = req.session.lat1 + ' ' + req.session.lng1 ; 
+      let curr_data = req.query.lat + ' ' + req.query.lng; 
+      let tcpRequest = prev_data + ' ' + curr_data; 
+      // tcp connection 
+      const client = net.createConnection(tcpPort, tcpHost, () => {console.log("Connected to Geo")}); // the tcp port and host
+      client.on('error', (err) => { /* handle error */ });
+      client.on('connect', () => {
+        client.write(tcpRequest); // Send a request
+        client.on('data', (data) => { response.push(data.toString().trim())});
+        client.on('end', () => {
+          let distance = response.join();
+          let result = 'The distance from (' + req.session.lat1 +', ' + req.session.lng1 + ') to (' 
+                                            + req.query.lat + ', ' + req.query.lng + ') is: ' + formatDistance(distance) + ' km'
+          req.session.lat1 = req.query.lat;
+          req.session.lng1 = req.query.lng;  
+          res.write(result);  
+          res.end();
+        });
+        client.end();        
+      });
+    }
+});
+
+
+app.get('/Catalog', function (req, res) { 
+  res.setHeader('Content-Type', 'application/json');
+  let id = req.query.id; 
+  // with this id, need to do sql request
+  dao.getCatalog(id, function(rows){
+    let response;
+    if(rows.length > 0){
+      response = rows;
+    }
+    res.write(JSON.stringify(response));
+    res.end();
+  });
+
+});
+
+
+app.get('/Trip', function (req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  let start = req.query.from;
+  let end = req.query.to;
+  // handle the params with UTF-8 
+  let encoded_start = encodeURIComponent(start);
+  let encoded_end = encodeURIComponent(end);
+
+  // creating the request URL
+  let requestURL = mapROOTURL + '&from=' + encoded_start + '&to=' + encoded_end + '&unit=k&timeType=1&useTraffic=true';
+
+  http.get(requestURL , (response) => {
+  const { statusCode } = response;
+  const contentType = response.headers['content-type'];
+
+  let error;
+  if (statusCode !== 200) {
+    error = new Error('Request Failed.\n' +
+                      `Status Code: ${statusCode}`);
+  } else if (!/^application\/json/.test(contentType)) {
+    error = new Error('Invalid content-type.\n' +
+                      `Expected application/json but received ${contentType}`);
+  }
+  if (error) {
+    console.error(error.message);
+    response.resume();
+    return;
+  }
+
+  response.setEncoding('utf8');
+  let rawData = '';
+  let result = {
+    distance : 0,
+    time : 0 
+  }
+  response.on('data', (chunk) => { rawData += chunk; });
+  response.on('end', () => {
+    try {
+      const parsedData = JSON.parse(rawData);
+      // get the data we need from the parsed data
+      if((parsedData.info.messages).length != 0 ){
+        result.distance = 0;
+        result.time = 0 ;
+      }else{
+        result.distance = parsedData.route.distance;
+        result.time = formatTime(parsedData.route.formattedTime);
+      }
+      res.write(JSON.stringify(result));
+      res.end();
+      
+    } catch (e) {
+      console.error(e.message);
+    }
+  });
+}).on('error', (e) => {
+  console.error(`Got error: ${e.message}`);
+});
+  
+});
+
+
+// this is the geoNode server not the tcp server
+const server = app.listen(port, function () {
+  const host = server.address().address;
+  const port = server.address().port;
+  console.log(`server listening to ${host}:${port}`);
+});

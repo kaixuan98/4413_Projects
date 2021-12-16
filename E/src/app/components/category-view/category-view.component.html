@@ -1,0 +1,30 @@
+<div id="category" class="container-lg container-fluid">
+    <div class="row row-cols-1 row-cols-lg-4 g-4">
+
+    <!-- the back to catalog pic tile -->
+    <div *ngIf="category">
+        <app-category-card [category]="category" [isBackButton]="true"></app-category-card>
+    </div>  
+
+    <!-- The list and the product info -->
+    <div class="col col-lg-9">
+        <div id="product-columns">
+            <div id="product-list-column">
+                <div id="product-list-scroller">
+                    <div id="product-list" class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action product-card"
+                                *ngFor="let product of products"
+                                [ngClass]="{'active': selected && product.id === selected.id }"
+                                [routerLink]="'/products/' + product.id">
+                                {{ product.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="product-info">
+                <app-product-details [product]="selected"></app-product-details>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>

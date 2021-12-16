@@ -1,0 +1,22 @@
+{
+  "/Catalog": {
+    "target": "http://localhost:44130",
+    "secure": false,
+    "logLevel": "debug"
+  },
+  "/GeoNode": {
+    "target": "http://localhost:44130",
+    "secure": false,
+    "logLevel": "debug"
+  },
+  "/api/*": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "logLevel": "debug"
+  },
+  "/B/*": {
+    "target": "http://localhost:4413",
+    "secure": false,
+    "logLevel": "debug"
+  }
+}

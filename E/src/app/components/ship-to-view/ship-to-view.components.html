@@ -1,0 +1,109 @@
+<div id="ship-to" class="container-lg container-fluid">
+    <div class="row align-items-start">
+        <div class="col col-lg-6 offset-lg-3">
+            <!-- header -->
+            <h1 class="display-6 text-center">
+            <a (click)="goBack()" class="back-btn fw-lighter text-dark text-decoration-none">
+                <i class="bi bi-arrow-left-circle"></i>
+            </a>
+            <span class="ms-4">Shipping Address</span>
+            </h1>
+            <hr class="mt-4">
+        </div>
+    </div>
+    <!-- The form -->
+    <form class="container" [formGroup]="shippingAddress" (ngSubmit)="onSubmit()" class="container"> 
+        <div class="row align-items-start">
+            <div class="col col-lg-6 offset-lg-3">
+                <!-- Name Input : required-->
+                <div class="mb-3 row">
+                <label id="recipient-label" for="recipient" class="col-sm-2 col-form-label fw-bold">Recipient:</label>
+                <div class="col-sm-10">
+                    <input type="text" name="recipient" formControlName="recipient"
+                            required class="form-control" placeholder="Jane Doe"
+                            [ngClass]="{'is-invalid': invalidInput('recipient'),
+                                        'is-valid':   validInput('recipient')}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <!-- Street First Line: Requried  -->
+                <label id="streetAddress-label" for="streetAddress" class="col-sm-2 col-form-label fw-bold">Address:</label>
+                <div class="col-sm-10">
+                    <input type="text" name="streetAddress" 
+                            required class="form-control" placeholder="4700 Keele Street"
+                            formControlName="streetAddress"
+                            [ngClass]="{'is-invalid': invalidInput('streetAddress'),
+                                        'is-valid':   validInput('streetAddress')}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <!-- Street 2: Not Required -->
+                <div class="col-sm-10 offset-sm-2">
+                    <input type="text" name="streetAddress2" class="form-control" placeholder="">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <!-- City: Required -->
+                <label id="city-label" for="city" class="col-sm-2 col-form-label fw-bold">City:</label>
+                <div class="col-sm-10">
+                    <input type="text" name="city" required class="form-control" placeholder="Toronto"
+                            formControlName="city"
+                            [ngClass]="{'is-invalid': invalidInput('city'),
+                                        'is-valid':   validInput('city')}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label id="province-label" for="province" class="col-sm-2 col-form-label fw-bold">Prov./State:</label>
+                <div class="col-sm-10">
+                    <!-- Pick a province -->
+                    <select name="province" formControlName="province" required class="form-select"
+                            [ngClass]="{'is-invalid': invalidInput('province'),
+                                        'is-valid':   validInput('province')}">
+                    <option [ngValue]="null" disabled hidden selected>Select...</option>
+                    <optgroup label="Canada">
+                        <option *ngFor="let province of CanadianProvincesAndTerritories" [ngValue]="province">
+                        {{ province.code }} - {{ province.name }}
+                        </option>
+                    </optgroup>
+                    <optgroup label="United States">
+                        <option *ngFor="let state of USStatesAndTerritories" [ngValue]="state">
+                        {{ state.code }} - {{ state.name }}
+                        </option>
+                    </optgroup>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <!-- Postal Code: required  -->
+                <label id="postalCode-label" for="postalCode" class="col-sm-2 col-form-label fw-bold">Postal/Zip:</label>
+                <div class="col-sm-10">
+                    <input type="text" name="postalCode" required class="form-control" 
+                            placeholder="A1B 2C3" formControlName="postalCode"
+                            [ngClass]="{'is-invalid': invalidInput('postalCode'),
+                                        'is-valid':   validInput('postalCode')}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <!-- Delivery Method -->
+                <label id="delivery-label" for="delivery" class="col-sm-2 col-form-label fw-bold">Delivery:</label>
+                <div class="col-sm-10">
+                <div class="card"><div class="card-body">
+                    <div class="form-check" *ngFor="let method of DeliveryMethods; let i = index">
+                        <input type="radio" id="delivery-{{ i }}" name="delivery" formControlName="delivery"
+                                [value]="method" class="form-check-input">
+                        <label for="delivery-{{ i }}" id="delivery-{{ i }}-label"
+                                class="form-check-label">{{ method }}</label>
+                    </div>
+                </div></div>
+                </div>
+            </div>
+            <!-- Submit Button -->
+            <div class="mb-3 row"><hr>
+                <div class="col-sm-10 offset-sm-2 d-grid">
+                <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </form>
+</div>

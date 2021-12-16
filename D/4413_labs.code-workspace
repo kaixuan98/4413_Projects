@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../C"
+		},
+		{
+			"path": "../T2"
+		},
+		{
+			"path": "../Q3B"
+		},
+		{
+			"path": "../E"
+		},
+		{
+			"path": "../Downloads/recommender"
+		}
+	],
+	"settings": {}
+}

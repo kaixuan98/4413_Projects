@@ -1,0 +1,18 @@
+
+<div id="catalog" class="container">
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+    <div class="col ratio-1x1 square">
+        <div class="card catalog-titlecard bg-dark text-white text-center">
+        <div class="card-img-overlay">
+            <h2 class="card-title display-6">Catalog</h2>
+        </div>
+        </div>
+    </div>
+       <app-category-card 
+            *ngFor="let category of categories" 
+            [category] = "category"
+            (cardClicked) = 'changeView($event)'
+        >
+        </app-category-card>
+    </div>
+</div>
